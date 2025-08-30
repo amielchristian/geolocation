@@ -110,14 +110,12 @@ export async function deleteHistoryEntry(id, location, ipv4Address) {
           db.close();
           return;
         } else {
-          // insert if entry doesn't exist
           db.run(
             `DELETE FROM user_history_entries
              WHERE ipv4_address = ? AND location = ? AND user_id = ?`,
             [ipv4Address, location, id],
             () => {
               db.close();
-              console.log('deleted entry');
             }
           );
         }

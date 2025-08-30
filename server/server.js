@@ -1,5 +1,11 @@
 import express from 'express';
-import { initializeDB, updateHistory, getHistory, verifyUser } from './db.js';
+import {
+  initializeDB,
+  updateHistory,
+  getHistory,
+  verifyUser,
+  deleteHistoryEntry,
+} from './db.js';
 import dotenv from 'dotenv';
 import { publicIpv4 } from 'public-ip';
 
@@ -35,6 +41,12 @@ app.get('/api/get-location', async (req, res) => {
   } catch (e) {
     res.status(500).json({ error: 'Failed to fetch location' });
   }
+});
+
+app.delete('/api/delete-history', async (req, res) => {
+  const { id, city, address } = req.body;
+  await deleteHistoryEntry(id, city, address);
+  res.status(200).json({ message: 'successfully deleted' });
 });
 
 app.post('/api/update-history', async (req, res) => {

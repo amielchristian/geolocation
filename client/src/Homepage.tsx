@@ -72,6 +72,30 @@ export default function Homepage({
     }
   };
 
+  const deleteHistoryEntry = async (location: string, address: string) => {
+    await fetch(`/api/delete-history`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: token,
+        city: location,
+        address: address,
+      }),
+    });
+
+    const updateHistory = async () => {
+      await fetch('/api/get-history', {
+        headers: { Authorization: `${token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          setHistory(data);
+        });
+    };
+    updateHistory();
+  };
+
   // get history on load
   // get default ip data as well
   useEffect(() => {
@@ -87,7 +111,7 @@ export default function Homepage({
           setHistory(data);
         });
     }
-  }, [token, ip]);
+  }, [token]);
 
   // update history when IP data changes as well
   useEffect(() => {
@@ -172,11 +196,12 @@ export default function Homepage({
                       <div className='flex flex-row gap-4'>
                         <input
                           type='checkbox'
-                          // onChange={(e) => {
-                          //   // Define your onCheck function here or pass as prop
-                          //   // Example:
-                          //   // onCheck(entry, e.target.checked)
-                          // }}
+                          onChange={() => {
+                            deleteHistoryEntry(
+                              entry.location,
+                              entry.ipv4_address
+                            );
+                          }}
                         />
                         <span>{`${entry.location}`}</span>
                       </div>
@@ -190,7 +215,7 @@ export default function Homepage({
         </div>
       </div>
       <button
-        className='border-3 p-4 rounded-lg font-bold w-[50%] hover:bg-gray-300 bg-gray-200'
+        className='border-3 p-4 rounded-lg font-bold w-[30%] hover:bg-gray-300 bg-gray-200 mt-5 mx-auto'
         id='logout'
         onClick={handleLogout}
       >
