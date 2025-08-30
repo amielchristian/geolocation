@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import LoginPage from './LoginPage';
 import Homepage from './Homepage';
+import './App.css';
 
 function App() {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));

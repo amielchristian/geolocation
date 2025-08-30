@@ -38,9 +38,9 @@ app.get('/api/get-location', async (req, res) => {
 });
 
 app.post('/api/update-history', async (req, res) => {
-  const { id, location, address } = await updateHistory();
-  const history = await updateHistory(id, location, address);
-  res.send(history);
+  const { id, city, address } = req.body;
+  await updateHistory(id, city, address);
+  res.status(401).json({ message: 'success' });
 });
 
 app.get('/api/get-history', async (req, res) => {

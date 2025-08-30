@@ -62,13 +62,14 @@ export async function verifyUser(email, password) {
 }
 
 export async function updateHistory(id, location, ipv4Address) {
+  console.log(id, location, ipv4Address);
   const db = new sqlite3.Database('db.sqlite3');
 
   db.serialize(() => {
     // check for an existing entry
     db.get(
-      'SELECT id FROM user_history_entries WHERE ipv4_address = ? AND user_id = ?',
-      [ipv4Address, id],
+      'SELECT id FROM user_history_entries WHERE ipv4_address = ? AND location = ? AND user_id = ?',
+      [ipv4Address, location, id],
       (_, entry) => {
         if (entry) {
           // update if exists
@@ -88,7 +89,35 @@ export async function updateHistory(id, location, ipv4Address) {
             [ipv4Address, location, id],
             () => {
               db.close();
-              console.log('new entry');
+            }
+          );
+        }
+      }
+    );
+  });
+}
+
+export async function deleteHistoryEntry(id, location, ipv4Address) {
+  const db = new sqlite3.Database('db.sqlite3');
+
+  db.serialize(() => {
+    // check for an existing entry
+    db.get(
+      'SELECT id FROM user_history_entries WHERE ipv4_address = ? AND location = ? AND user_id = ?',
+      [ipv4Address, location, id],
+      (_, entry) => {
+        if (!entry) {
+          db.close();
+          return;
+        } else {
+          // insert if entry doesn't exist
+          db.run(
+            `DELETE FROM user_history_entries
+             WHERE ipv4_address = ? AND location = ? AND user_id = ?`,
+            [ipv4Address, location, id],
+            () => {
+              db.close();
+              console.log('deleted entry');
             }
           );
         }
