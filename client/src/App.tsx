@@ -1,22 +1,16 @@
-import { useState, useEffect } from "react";
-import { getMessage } from "./lib/services";
+import { useState } from 'react';
+import LoginPage from './LoginPage';
+import Homepage from './Homepage';
 
 function App() {
-  const [message, setMessage] = useState<string>("");
+  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
 
-  useEffect(() => {
-    const getResponse = async () => {
-      const response = await getMessage();
-      setMessage(response.message);
-    };
-    getResponse();
-  }, [message]);
+  // display login screen if not authenticated
+  if (!token) {
+    return <LoginPage setToken={setToken} />;
+  }
 
-  return (
-    <>
-      <div>Hi! A message from the API: {message}</div>
-    </>
-  );
+  return <Homepage token={token} setToken={setToken} />;
 }
 
 export default App;
