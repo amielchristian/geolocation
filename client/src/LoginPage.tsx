@@ -48,7 +48,7 @@ export default function LoginPage({
           />
         </div>
         <button
-          className='border-3 p-4 rounded-lg font-bold w-[50%] mx-auto hover:bg-gray-300 bg-gray-200'
+          className='border-3 p-4 rounded-lg font-bold w-[50%] mx-auto mt-5 hover:bg-gray-300 bg-gray-200'
           type='submit'
         >
           Login
