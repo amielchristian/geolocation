@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { getMessage } from './lib/services';
+import { useState, useEffect } from "react";
+import { getMessage } from "./lib/services";
 
 function App() {
-  const [message, setMessage] = useState<string>('');
+  const [message, setMessage] = useState<string>("");
 
   useEffect(() => {
     const getResponse = async () => {
