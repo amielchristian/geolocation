@@ -60,11 +60,33 @@ export default function Homepage({
   }, []);
 
   const getIpData = (ip: string | undefined) => {
+    if (ip === '') {
+      fetch(`/api/get-location`)
+        .then((res) => res.json())
+        .then((data) => setIpData(data));
+      return;
+    }
     fetch(`/api/get-location?address=${ip}`)
       .then((res) => res.json())
       .then((data) => setIpData(data));
 
-    
+    fetch(`/api/update-history`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token,
+        city: ipData?.location?.location?.city,
+        currentIpv4,
+      }),
+    });
+
+    if (token) {
+      fetch('/api/get-history', {
+        headers: { Authorization: `${token}` },
+      })
+        .then((res) => res.json())
+        .then(setHistory);
+    }
   };
 
   // for logging out
@@ -77,8 +99,25 @@ export default function Homepage({
   return (
     <div>
       <button onClick={handleLogout}>Logout</button>
-      <div>{JSON.stringify(ipData)}</div>
-      <input value={currentIpv4} onChange={(e) => setCurrentIpv4(e.target.value)} type='text' />
+      <div>
+        {ipData && (
+          <>
+            <h1>Your IP: {ipData.ip}</h1>
+            {ipData.location && (
+              <h3>
+                {ipData.location.location.city},
+                {ipData.location.location.region},
+                {ipData.location.location.country}
+              </h3>
+            )}
+          </>
+        )}
+      </div>
+      <input
+        value={currentIpv4}
+        onChange={(e) => setCurrentIpv4(e.target.value)}
+        type='text'
+      />
       <button
         onClick={() => {
           getIpData(currentIpv4);

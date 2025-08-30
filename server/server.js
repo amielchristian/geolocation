@@ -15,13 +15,11 @@ initializeDB();
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
   const credentials = await verifyUser(email, password);
-  console.log(credentials);
   if (credentials.token) res.json(credentials);
   else res.status(401).json({ error: 'Invalid credentials.' });
 });
 
 app.get('/api/get-location', async (req, res) => {
-  console.log(req.body);
   let ip = req.query.address ?? req.ip;
 
   if (ip === '::1' || ip === '127.0.0.1') {
@@ -39,8 +37,9 @@ app.get('/api/get-location', async (req, res) => {
   }
 });
 
-app.get('/api/update-history', async (req, res) => {
-  const history = await getHistory(req.headers.authorization);
+app.post('/api/update-history', async (req, res) => {
+  const { id, location, address } = await updateHistory();
+  const history = await updateHistory(id, location, address);
   res.send(history);
 });
 

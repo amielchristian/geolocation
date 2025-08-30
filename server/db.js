@@ -61,47 +61,39 @@ export async function verifyUser(email, password) {
   });
 }
 
-export async function updateHistory(email, location, ipv4Address) {
+export async function updateHistory(id, location, ipv4Address) {
   const db = new sqlite3.Database('db.sqlite3');
 
   db.serialize(() => {
-    // get id from email
-    db.get('SELECT id FROM users WHERE email = ?', [email], (_, row) => {
-      if (!row) {
-        db.close();
-        return;
-      }
-      const userId = row.id;
-      // check for an existing entry
-      db.get(
-        'SELECT id FROM user_history_entries WHERE ipv4_address = ? AND user_id = ?',
-        [ipv4Address, userId],
-        (_, entry) => {
-          if (entry) {
-            // update if exists
-            db.run(
-              'UPDATE user_history_entries SET updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-              [entry.id],
-              () => {
-                db.close();
-                console.log('updated');
-              }
-            );
-          } else {
-            // insert if entry doesn't exist
-            db.run(
-              `INSERT INTO user_history_entries (ipv4_address, location, created_at, updated_at, user_id)
+    // check for an existing entry
+    db.get(
+      'SELECT id FROM user_history_entries WHERE ipv4_address = ? AND user_id = ?',
+      [ipv4Address, id],
+      (_, entry) => {
+        if (entry) {
+          // update if exists
+          db.run(
+            'UPDATE user_history_entries SET updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+            [entry.id],
+            () => {
+              db.close();
+              console.log('updated');
+            }
+          );
+        } else {
+          // insert if entry doesn't exist
+          db.run(
+            `INSERT INTO user_history_entries (ipv4_address, location, created_at, updated_at, user_id)
                VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)`,
-              [ipv4Address, location, userId],
-              () => {
-                db.close();
-                console.log('new entry');
-              }
-            );
-          }
+            [ipv4Address, location, id],
+            () => {
+              db.close();
+              console.log('new entry');
+            }
+          );
         }
-      );
-    });
+      }
+    );
   });
 }
 
@@ -110,11 +102,11 @@ export async function getHistory(id) {
 
   return new Promise((resolve) => {
     db.all(
-      'SELECT * FROM user_history_entries WHERE user_id = ?',
+      'SELECT * FROM user_history_entries WHERE user_id = ? ORDER BY updated_at DESC',
       [id],
       (_, rows) => {
         db.close();
-        console.log(rows)
+        console.log(rows);
         resolve(rows);
       }
     );
